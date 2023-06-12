@@ -1,5 +1,20 @@
 import RandExp from "randexp";
 
+const randomBytes = (byteLength: number): Uint8Array => {
+    const hasGlobalBuffer = typeof Buffer === 'function' && Buffer.prototype?._isBuffer !== true;
+    if (hasGlobalBuffer) {
+        const crypto = require('crypto');
+        return crypto.randomBytes(byteLength)
+    } else {
+        const { crypto } = globalThis as {
+            crypto?: { getRandomValues?: (space: Uint8Array) => Uint8Array };
+        };
+            // @ts-expect-error: crypto.getRandomValues cannot actually be null here
+            // You cannot separate getRandomValues from crypto (need to have this === crypto)
+        return crypto.getRandomValues( new Uint8Array(byteLength));
+    }
+}
+
 /**
  * @internal
  */
@@ -64,6 +79,33 @@ export namespace RandomGenerator {
 
     export const ipv6 = (): string =>
         array(() => integer(0, 65535).toString(16), 8).join(":");
+
+    export const objectid = (): string => {
+        const index = Math.floor(Math.random() * 0xffffff);
+        const time = Math.floor(Date.now() / 1000);
+        const inc = (index+ 1) % 0xffffff;
+        const buffer = new Uint8Array(12);
+        
+        // 4-byte timestamp
+        new DataView(buffer.buffer, buffer.byteOffset, buffer.byteLength).setUint32(0, time, false);
+    
+        const PROCESS_UNIQUE =  randomBytes(5);
+    
+        // 5-byte process unique
+        buffer[4] = PROCESS_UNIQUE[0] as number;
+        buffer[5] = PROCESS_UNIQUE[1] as number;
+        buffer[6] = PROCESS_UNIQUE[2]as number;
+        buffer[7] = PROCESS_UNIQUE[3]as number;
+        buffer[8] = PROCESS_UNIQUE[4]as number;
+    
+        // 3-byte counter
+        buffer[11] = inc & 0xff;
+        buffer[10] = (inc >> 8) & 0xff;
+        buffer[9] = (inc >> 16) & 0xff;
+    
+        // convert to hex
+        return Array.from(buffer, byte => byte.toString(16).padStart(2, '0')).join('');
+    }
 
     export const pattern = (regex: RegExp): string => new RandExp(regex).gen();
 

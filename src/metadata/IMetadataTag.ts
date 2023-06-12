@@ -62,7 +62,7 @@ export namespace IMetadataTag {
     ----------------------------------------------------------- */
     export interface IFormat {
         kind: "format";
-        value: "uuid" | "email" | "url" | "ipv4" | "ipv6" | "date" | "datetime";
+        value: "uuid" | "email" | "url" | "ipv4" | "ipv6" | "date" | "datetime" | "objectid";
     }
 
     export interface IPattern {

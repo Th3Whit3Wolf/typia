@@ -242,6 +242,7 @@ const FORMATS: Map<string, IMetadataTag.IFormat["value"]> = new Map([
     ["datetime", "datetime"],
     ["date-time", "datetime"],
     ["dateTime", "datetime"],
+    ["objectid", "objectid"]
 ]);
 
 const WRONG_TYPE = (

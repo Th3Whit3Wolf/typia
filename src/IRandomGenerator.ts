@@ -14,6 +14,7 @@ export interface IRandomGenerator {
     url(): string;
     ipv4(): string;
     ipv6(): string;
+    objectid(): string;
     pattern(regex: RegExp): string;
     date(minimum?: number, maximum?: number): string;
     datetime(minimum?: number, maximum?: number): string;
